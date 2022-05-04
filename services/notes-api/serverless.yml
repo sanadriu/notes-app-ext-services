@@ -1,0 +1,108 @@
+service: notes-app-ext-notes-api
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+
+custom: ${file(../../serverless.common.yml):custom}
+
+package:
+  individually: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: eu-north-1
+  tracing:
+    lambda: true
+
+  environment:
+    stage: ${self:custom.stage}
+    tableName: !ImportValue ${self:custom.stage}-ExtNotesTable
+
+  apiGateway:
+    restApiId: !ImportValue ${self:custom.stage}-ExtRestApiId
+    restApiRootResourceId: !ImportValue ${self:custom.stage}-ExtRestApiRootResourceId
+    
+  iam: 
+    role:
+      statements:
+        - ${file(../../serverless.common.yml):lambdaPolicyXRay}
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: 
+            !ImportValue ${self:custom.stage}-ExtNotesTableArn
+
+functions:
+  create:
+    handler: lambdas/create.main
+    events:
+      - http:
+          path: /notes
+          method: post
+          cors: true
+          authorizer: 
+            type: aws_iam
+  get:
+    handler: lambdas/get.main
+    events:
+      - http:
+          path: /notes/{id}
+          method: get
+          cors: true
+          authorizer: 
+            type: aws_iam
+  list:
+    handler: lambdas/list.main
+    events:
+      - http:
+          path: /notes
+          method: get
+          cors: true
+          authorizer: 
+            type: aws_iam
+  update:
+    handler: lambdas/update.main
+    events:
+      - http:
+          path: /notes/{id}
+          method: patch
+          cors: true
+          authorizer: 
+            type: aws_iam
+  delete:
+    handler: lambdas/delete.main
+    events:
+      - http:
+          path: /notes/{id}
+          method: delete
+          cors: true
+          authorizer: 
+            type: aws_iam
+
+# resources:
+#   # API Gateway Errors
+#   - ${file(resources/api-gateway-errors.yml)}
+#   # Cognito Identity Pool Policy
+#   - ${file(resources/cognito-policy.yml)}
+  
+#   Outputs:
+#     ApiGatewayRestApiId:
+#       Value:
+#         Ref: ApiGatewayRestApi
+#       Export:
+#         Name: ${self:custom.stage}-ExtApiGatewayRestApiId
+    
+#     ApiGatewayRestApiRootResourceId:
+#       Value:
+#         Fn::GetAtt: [ApiGatewayRestApi, RootResourceId]
+#       Export:
+#         Name: ${self:custom.stage}-ExtApiGatewayRestApiRootResourceId

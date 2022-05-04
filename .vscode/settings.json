@@ -1,0 +1,6 @@
+{
+  "yaml.schemas": {
+    "file:///c%3A/Users/Usuario/.vscode/extensions/atlassian.atlascode-2.10.12/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+    "https://raw.githubusercontent.com/lalcebo/json-schema/master/serverless/reference.json": "file:///c%3A/Users/Usuario/Documents/Serverless/notes-app-services/services/notes-api/serverless.yml"
+  }
+}

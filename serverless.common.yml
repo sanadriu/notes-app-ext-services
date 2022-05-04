@@ -1,0 +1,11 @@
+custom:
+  keyId: 8d28d56d-5985-449f-8fd2-9845abc20d1c
+  stage: ${opt:stage, self:provider.stage}
+  app: ${self:custom.stage}
+
+lambdaPolicyXRay:
+  Effect: Allow
+  Action:
+    - xray:PutTraceSegments
+    - xray:PutTelemetryRecords
+  Resource: "*"

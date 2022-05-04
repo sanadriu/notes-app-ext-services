@@ -1,0 +1,12 @@
+Resources:
+  NotePurchasedTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: ${self:custom.stage}-note-purchased
+
+Outputs:
+  NotePurchasedTopicArn:
+    Value:
+      Ref: NotePurchasedTopic
+    Export:
+      Name: ${self:custom.stage}-ExtNotePurchasedTopicArn

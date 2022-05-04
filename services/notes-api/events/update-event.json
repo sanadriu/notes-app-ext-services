@@ -1,0 +1,11 @@
+{
+	"pathParameters": {
+		"id": "cb4de7ef-2ff3-45bb-8c4e-99cce934532c"
+	},
+	"body": "{\"content\":\"lorem potsum\"}",
+	"requestContext": {
+		"identity": {
+			"cognitoIdentityId": "foo"
+		}
+	}
+}

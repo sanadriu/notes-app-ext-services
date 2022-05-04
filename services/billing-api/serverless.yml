@@ -1,0 +1,52 @@
+service: notes-app-ext-billing-api
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+
+custom: ${file(../../serverless.common.yml):custom}
+
+package:
+  individually: true
+  
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: eu-north-1
+  tracing:
+    lambda: true
+
+  environment:
+    stage: ${self:custom.stage}
+    stripeSecretKey: ${ssm:/notes-app/stripeSecretKey}
+
+  apiGateway:
+    restApiId: !ImportValue ${self:custom.stage}-ExtRestApiId
+    restApiRootResourceId: !ImportValue ${self:custom.stage}-ExtRestApiRootResourceId
+
+  iam: 
+    role:
+      statements:
+        - ${file(../../serverless.common.yml):lambdaPolicyXRay}
+
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource:
+            - Ref: NotePurchasedTopic
+
+functions:
+  billing:
+    handler: lambdas/billing.main
+    events:
+      - http:
+          path: /billing
+          method: post
+          cors: true
+          authorizer: 
+            type: aws_iam
+
+resources:
+  - ${file(./resources/sns-topics.yml)}
+
